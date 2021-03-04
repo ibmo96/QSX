@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Copyright (C) OQS-MOFF.
+
+#Script to setup prerequesites for an OQS-enabled NGINX server - for UNIX systems. 
+
+##
+###
+##
+
+# variables for directories and build params: 
+
+#SSL_DIR=' #I think maybe theres no need to specify dirs and just clone the repos at the dir of the script
+
+MAKE_PARAM='make -j 2' #not sure if this is how to specify this for bash, its how it was done in the Dockerfile
+
+
+# Retrieve and build liboqs/OpenSSL 
+ 	##Make sure it can be built by testing the build process with the regular OpenSSL
+
+#Does that mean we have to clone and try to build the regular OpenSSL?!!?!?!
+
+# Clone  
+git clone --branch OQS-OpenSSL_1_1_1-stable https://github.com/open-quantum-safe/openssl.git
+
+git clone --branch main https://github.com/open-quantum-safe/liboqs.git
+
+## clone git repos and place in directory 
+
+
+ 
