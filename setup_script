@@ -2,52 +2,81 @@
 
 # Copyright (C) OQS-MOFF.
 
-#Script to setup prerequesites for an OQS-enabled NGINX server - for UNIX systems. 
+#Script to setup prerequesites for an OQS-enabled NGINX server - for UNIX systems.
 
+# FUNCTIONS
 
-# variables for directories and build params: 
-
-#SSL_DIR=' #I think maybe theres no need to specify dirs and just clone the repos at the dir of the script
-
-MAKE_PARAM='make -j 2' #not sure if this is how to specify this for bash, its how it was done in the Dockerfile
-
-
-# Retrieve and build liboqs/OpenSSL 
-
-
-##Windows
-
-	##Make sure it can be built by testing the build process with the regular OpenSSL
-	#Does that mean we have to clone and try to build the regular OpenSSL?!!?!?!
-
-## Linux / MacOS
-
-### Install/check for dependencies 
-
-	# What if the target machines asks for password due to "sudo"? what do we do then
-	sudo apt install cmake gcc libtool libssl-dev make ninja-build git
-
-
-### Clone repos  
-git clone --branch OQS-OpenSSL_1_1_1-stable https://github.com/open-quantum-safe/openssl.git
-
-git clone --branch main https://github.com/open-quantum-safe/liboqs.git
-
-## clone git repos and place in directory 
-
-
-
-## --END -- (call migration script) 
-
-
-
-
-# FUNCTIONS 
-function git_clone() {
-    cd $1 #dir variable
-    git clone $2 #git url to clone
-    cd ..
+## Clone down liboqs and OQS-OpenSSL
+function get_libs {
+    git clone --branch OQS-OpenSSL_1_1_1-stable https://github.com/open-quantum-safe/openssl.git
+    git clone --branch main https://github.com/open-quantum-safe/liboqs.git
 }
- 
+
+## Retrieve the NGINX sourcefiles
+function get_nginx {
+    wget nginx.org/download/nginx-$NGINX_VER.tar.gz && tar -zxvf nginx-$NGINX_VER.tar.gz;
+}
+
+
+function test_echo {
+echo "dir variable is set to: $LIB_DIR"
+
+}
+
+
+# variables for directories and build params:
+
+LIB_DIR='/opt'
+  ## NGINX VERSION (please specify the latest stable version, currently this tool is experiencing compatability issues with the  mainline version)
+NGINX_VER='1.18.0'
+MAKE_PARAM='-j 2'
+
+#USER INPUT FOR VARIABLES
+
+echo 'This is the setup script for the OQS-MOFF tool!'
+echo 'Please specify a directory for installing liboqs, openssl and nginx sourcefiles, if you dont wish so press enter and they will be installed in /opt"' 
+
+read DIR_RES
+
+if [[ -z $DIR_RES ]]
+then
+	#get_libs
+	test_echo
+else
+	LIB_DIR=$DIR_RES
+        #get_libs
+	test_echo
+fi
+
+echo 'Input the desired NGINX version in the following format: \"1.xx.x\", else press enter and version 1.18.0 will be used'
+
+read VER_RES
+
+if [[ -z $VER_RES ]]
+then
+	#get_nginx
+else
+	NGINX_VER=$VER_RES
+	echo "nginx ver is set to: $NGINX_VER"
+	#get_nginx
+fi
+
+### Install/check for dependencies
+
+    # What if the target machines asks for password due to "sudo"? what do we do then
+    # sudo apt install cmake gcc libtool libssl-dev make ninja-build git
+
+
+
+#cd $LIB_DIR
+
+#cd /liboqs
+#ls
+
+
+
+## --END -- (call migration script)
+
+
 
 

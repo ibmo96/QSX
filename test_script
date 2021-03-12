@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Copyright (C) OQS-MOFF.
+
+
+# Create self-signed cert using the downloaded liboqs openssl
+
+
+# Either download and install the OQS demo of the OQS enabled version of curl, or install the sourcefiles directly and run a test curl on the users nginx. 
+
+
+
+
+# user should probably give site param (ip:port)
+#cd liboqs
+#mkdir build && cd build && 
+
+
+
+function test_echo {
+echo 'Hello World!'
+}
+
+test_echo
