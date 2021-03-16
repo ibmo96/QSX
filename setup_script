@@ -57,7 +57,7 @@ read VER_RES
 if [[ -z $VER_RES ]]
 then
 	echo 'using nginx version:  $NGINX_VER'
-	#get_nginx
+	get_nginx
 else
 	NGINX_VER=$VER_RES
 	echo 'nginx ver is set to: $NGINX_VER'
