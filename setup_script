@@ -2,9 +2,16 @@
 
 # Copyright (C) OQS-MOFF.
 
-#Script to setup prerequesites for an OQS-enabled NGINX server - for UNIX systems.
+#Script to setup prerequesites for an OQS-enabled NGINX server - for DEBIAN-based systems.
 
 # FUNCTIONS
+
+## Dependencies needed
+
+function get_dependencies {
+	sudo apt install cmake gcc libtool libssl-dev make ninja-build git doxygen
+	#doxygen needed for liboqs
+}
 
 ## Clone down liboqs and OQS-OpenSSL
 function get_libs {
@@ -30,23 +37,24 @@ LIB_DIR='/opt'
   ## NGINX VERSION (please specify the latest stable version, currently this tool is experiencing compatability issues with the  mainline version)
 NGINX_VER='1.18.0'
 MAKE_PARAM='-j 2'
+LIBOQS_BUILD_PARAM ='-DOQS_DIST_BUILD=ON'
 
 #USER INPUT FOR VARIABLES
 
 echo 'This is the setup script for the OQS-MOFF tool!'
-echo 'Please specify a directory for installing liboqs, openssl and nginx sourcefiles, if you dont wish so press enter and they will be installed in /opt"' 
+echo 'Please make sure you are on root user, as some dependencies are needed and will be installed' 
+echo 'Specify a directory for installing liboqs, openssl and nginx sourcefiles, if you dont wish so press enter and they will be installed in /opt"' 
 
 read DIR_RES
 
 if [[ -z $DIR_RES ]]
 then
-	get_libs
+	cd $LIB_DIR && get_libs
 	#test_echo
 else
 	LIB_DIR=$DIR_RES
         echo 'working directory is set to: ${LIB_DIR}'
-	cd LIB_DIR
-	get_libs
+	cd $LIB_DIR && get_libs
 	#test_echo
 fi
 
@@ -61,24 +69,21 @@ then
 else
 	NGINX_VER=$VER_RES
 	echo 'nginx ver is set to: $NGINX_VER'
-	get_nginx
+	cd $LIB_DIR && get_nginx
 fi
 
-### Install/check for dependencies
-
-    # What if the target machines asks for password due to "sudo"? what do we do then
-    # sudo apt install cmake gcc libtool libssl-dev make ninja-build git
+## Build liboqs 
+cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PARAM -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs .. && ninja && ninja install 
 
 
+## Build nginx (will also build OQS-openssl) 
+cd LIB_DIR/nginx-$NGINX_VER && ./configure --with-debug --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --without-http_gzip_module --with-cc-opt=-I$LIB_DIR/openssl/oqs/include --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" --without-http-rewrite_module && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
 
-#cd $LIB_DIR
-
-#cd /liboqs
-#ls
+## Export 'oqsnginx' as shell command that targets the newly built nginx from sourcefile (in case the user has package nginx installed)
+ ### otherwise we just substitute the binaries (shouldnt the migration script do that?) 
 
 
-
-## --END -- (call migration script)
+## --END --
 
 
 
