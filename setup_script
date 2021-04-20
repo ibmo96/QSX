@@ -38,6 +38,7 @@ LIB_DIR='/opt'
 NGINX_VER='1.18.0'
 MAKE_PARAM='-j 2'
 LIBOQS_BUILD_PARAM ='-DOQS_DIST_BUILD=ON'
+SIG_ALG='dilithium2'
 
 #USER INPUT FOR VARIABLES
 
@@ -78,6 +79,23 @@ cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PA
 
 ## Build nginx (will also build OQS-openssl) 
 cd LIB_DIR/nginx-$NGINX_VER && ./configure --with-debug --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --without-http_gzip_module --with-cc-opt=-I$LIB_DIR/openssl/oqs/include --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" --without-http-rewrite_module && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
+
+
+
+
+## Create test certificate using OQS domain
+set -x #prints executed commands 
+cd $LIB_DIR && mkdir cacert & mkdir pki && 
+$LIB_DIR/openssl/apps/openssl req -x509 -new -newkey $SIG_ALG -keyout CA.key -out cacert/CA.crt -nodes -subj "/CN=oqstest CA" -days 365 -config $LIB_DIR/openssl//apps/openssl.cnf && 
+ $LIB_DIR/openssl/apps/openssl req -new -newkey $SIG_ALG -keyout pki/server.key -out server.csr -nodes -subj "/CN=oqs-nginx" -config $LIB_DIR/openssl/apps/openssl.cnf &&
+$LIB_DIR/openssl/apps/openssl x509 -req -in server.csr -out pki/server.crt -CA cacert/CA.crt -CAkey CA.key -CAcreateserial -days 365
+
+
+## Input generated certs into nginx.conf file
+
+#Locate file and input parameters for HTTPS server and refference the QOS generated certificate/key
+
+
 
 ## Export 'oqsnginx' as shell command that targets the newly built nginx from sourcefile (in case the user has package nginx installed)
  ### otherwise we just substitute the binaries (shouldnt the migration script do that?) 
