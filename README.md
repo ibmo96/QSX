@@ -1,6 +1,6 @@
-# OQS-MOFF  
+# Quantum-Safe Nginx (QSX) 
 
-This is the official OQS-MOFF tool for setting up and prototpying a quantum-secure NGINX server. 
+This is the official QSX tool for setting up and prototpying a quantum-secure NGINX server. 
 
 
 ## PREFIX 
