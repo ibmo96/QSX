@@ -85,13 +85,27 @@ sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
 sudo mv /usr/local/nginx/sbin/nginx /usr/sbin/nginx
 
 
+# Get domain-name (credit: https://gist.github.com/Tucker-Eric/c9341e1e75aac3213963a17018a1b6e0) 
+echo "What is the domain you would like to generate a quantum-safe certificate for?"
+read DOMAIN
+
+# check the domain is valid!
+PATTERN="^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$";
+if [[ "$DOMAIN" =~ $PATTERN ]]; then
+	DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
+	echo "Creating hosting for:" $DOMAIN
+else
+	echo "invalid domain name"
+	exit 1
+fi
+
+
 ## Create test certificate using OQS domain
 set -x #prints executed commands 
 cd $LIB_DIR && mkdir cacert & mkdir pki && 
-$LIB_DIR/openssl/apps/openssl req -x509 -new -newkey $SIG_ALG -keyout CA.key -out cacert/CA.crt -nodes -subj "/CN=oqstest CA" -days 365 -config $LIB_DIR/openssl//apps/openssl.cnf && 
- $LIB_DIR/openssl/apps/openssl req -new -newkey $SIG_ALG -keyout pki/server.key -out server.csr -nodes -subj "/CN=oqs-nginx" -config $LIB_DIR/openssl/apps/openssl.cnf &&
+$LIB_DIR/openssl/apps/openssl req -x509 -new -newkey $SIG_ALG -keyout CA.key -out cacert/CA.crt -nodes -subj "/CN=$DOMAIN" -days 365 -config $LIB_DIR/openssl//apps/openssl.cnf && 
+ $LIB_DIR/openssl/apps/openssl req -new -newkey $SIG_ALG -keyout pki/server.key -out server.csr -nodes -subj "/CN=$DOMAIN" -config $LIB_DIR/openssl/apps/openssl.cnf &&
 $LIB_DIR/openssl/apps/openssl x509 -req -in server.csr -out pki/server.crt -CA cacert/CA.crt -CAkey CA.key -CAcreateserial -days 365
-
 
 
 ## Input generated certs into nginx.conf file
