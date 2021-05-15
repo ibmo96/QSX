@@ -1,0 +1,23 @@
+ server {
+        listen       PORTTOBESPECIFIED ssl;
+         server_name  www.oqs-moff.info;
+       # server_name oqs-https-server;
+
+    # SSL STUFF
+        ssl_certificate      SSLCERTTOBESPECIFIED;
+        ssl_certificate_key  SSLCERTKEYTOBESPECIFIED;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        ssl_protocols TLSv1.3;
+
+      # ssl_ciphers  HIGH:!aNULL:!MD5;
+      # ssl_prefer_server_ciphers  on;
+        ssl_ecdh_curve 'SSLCURVEALGORITHMS';
+
+        location / {
+            root   ROOTHTMLFILELOCATION;
+            index  HTMLFILENAME;
+        }
+    }
