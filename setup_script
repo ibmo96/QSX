@@ -108,12 +108,26 @@ $LIB_DIR/openssl/apps/openssl req -x509 -new -newkey $SIG_ALG -keyout CA.key -ou
 $LIB_DIR/openssl/apps/openssl x509 -req -in server.csr -out pki/server.crt -CA cacert/CA.crt -CAkey CA.key -CAcreateserial -days 365
 
 
-## Input generated certs into nginx.conf file
+
+# Read which port user wants to run quantum-safe server on
+
+PORT=443
+read TMP_PORT
+
+if [[ -z $TMP_PORT ]]
+then
+	echo 'No port specified, using port 443..'
+else
+	PORT=$TMP_PORT
+        echo 'Port set to: ${PORT}'
+fi
+
+
+## Input generated certs and other necessary directives into nginx.conf file
 	
 	#Locate file and input parameters for HTTPS server and refference the QOS generated certificate/key (also tthe ecdh_ssl_curve directive) 
 
 
-     ## LEARN METHOD FROM CERTBOT (--nginx param) 
 
 
 # Send signals to NGINX to enforce the upgraded binary and conf files: 
