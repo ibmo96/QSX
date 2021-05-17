@@ -1,0 +1,12 @@
+nginx.conf file modification reqs: 
+
+1. Find all lines with the "listen   PORT" line 
+
+2. Then underneath these lines, find the lines with "ssl_certificate" & "ssl_certificate_key" directives 
+
+	2.a: if lines from (2) are not found before the occurance of two "}" (one for location and one for ending the server { directive then
+		must input ssl_certificate and ssl_certificate_key right before the second "}". 
+
+3. Input location of generated certificate and key 
+
+4. save and exit file
