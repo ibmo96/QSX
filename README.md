@@ -15,3 +15,20 @@ This is the official QSX tool for setting up and prototpying a quantum-secure NG
 - The appends necessary build parameters to the NGINX configuration arguments, to the user's already existing configuration arguments. 
 - NGINX is configured to use HTTPS to enabled SSL, with TLS version 1.3.
 - The tool provides a test script for generating a quantum-secure self-signed (or part of a chain) certificate.
+
+
+### HOWTO
+
+#### 1: Setup 
+
+On the build machine run the following to download and build the necessary dependencies and libraries: 
+
+```
+./build_setup.sh
+```
+
+Once successfully built, go ahead and run the gen
+
+```
+
+```
