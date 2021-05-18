@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Copyright (C) OQX.
+
+# Script to traverse contents of nginx.conf file
+
+# iterate the line of a file and call input function
+iterlines() {
+    (( $# < 2 )) && { echo "Usage: iterlines <File> <Callback>"; return; }
+    local File=$1
+    local Func=$2
+    n=$(cat "$File" | wc -l)
+    for (( i=1; i<=n; i++ )); do
+        "$Func" "$(sed "${i}q;d" "$File")"
+    done
+}
