@@ -105,9 +105,9 @@ def line_search(data, strings_to_search, index):
    for i, line in enumerate(data, start=index):
       if all(x in line for x in strings_to_search):  #When we find that string, we then must search for the string where the certificate directives are:
 	      if line.startswith('#'):  #If the found server directive is commented out, raise exception that HTTPS is not enabled on the server
-		     continue
+		      continue
 	      else:
-		     return i, line
+		      return i, line
    return None
 
 
@@ -189,7 +189,7 @@ def modify_conf(filename, port, cert, key, algos,  server_name):
             raise Exception('Desired server directive is commented out.. Please control that HTTPS is enabled on the server...(Certbot is a good tool for that)')
 
    except Exception as e:
-	 print(e)
+	   print(e)
 
 
 def write_nginx_config(f, i, port, sig, k):
