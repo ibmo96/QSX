@@ -9,8 +9,9 @@
 ## Dependencies needed
 
 function get_dependencies {
-	sudo apt install cmake gcc libtool libssl-dev make ninja-build git doxygen
-	#doxygen needed for liboqs
+	sudo apt install cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip
+	
+	pip install common
 }
 
 ## Clone down liboqs and OQS-OpenSSL
