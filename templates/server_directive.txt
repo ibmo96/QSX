@@ -1,8 +1,7 @@
 # MANAGED BY QSX
  server {
         listen       PORTTOBESPECIFIED ssl;
-         server_name  www.oqs-moff.info;
-       # server_name oqs-https-server;
+         server_name  ;
 
         ssl_certificate      SSLCERTTOBESPECIFIED;
         ssl_certificate_key  SSLCERTKEYTOBESPECIFIED;

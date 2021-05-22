@@ -84,12 +84,12 @@ cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PA
 
 echo 'Retrieving current NGINX configuration arguments...'
 
-declare -a cmdArgs='([0]="nginx -V  2>&1 | grep \'configure arguments:\' | awk \'{print \$2}\' FS=\'configure arguments:\'")'
-#"${cmdArgs[0]}"
+my_command=$(nginx -V  2>&1 | grep 'configure arguments:' | awk '{print $2}' FS='configure arguments:')
+echo $my_command
 
 
 ## Build nginx (will also build OQS-openssl) 
-cd LIB_DIR/nginx-$NGINX_VER && ./configure ${cmdArgs[0]} --with-debug --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --without-http_gzip_module --with-cc-opt=-I$LIB_DIR/openssl/oqs/include --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" --without-http-rewrite_module && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install &&
+cd LIB_DIR/nginx-$NGINX_VER && ./configure $my_command --with-debug --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --without-http_gzip_module --with-cc-opt=-I$LIB_DIR/openssl/oqs/include --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" --without-http-rewrite_module && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install &&
 
 #upgrade new binary file
 sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
@@ -100,7 +100,8 @@ sudo mv /usr/local/nginx/sbin/nginx /usr/sbin/nginx
 echo "What is the domain you would like to generate a quantum-safe certificate for?"
 read DOMAIN
 
-# check the domain is valid!
+'''
+# check the domain is valid!   
 PATTERN="^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$";
 if [[ "$DOMAIN" =~ $PATTERN ]]; then
 	DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
@@ -109,14 +110,14 @@ else
 	echo "invalid domain name"
 	exit 1
 fi
-
+'''
 
 ## Create test certificate using OQS domain
 set -x #prints executed commands 
 cd $LIB_DIR && mkdir cacert & mkdir pki && 
 $LIB_DIR/openssl/apps/openssl req -x509 -new -newkey $SIG_ALG -keyout CA.key -out cacert/CA.crt -nodes -subj "/CN=$DOMAIN" -days 365 -config $LIB_DIR/openssl//apps/openssl.cnf && 
- $LIB_DIR/openssl/apps/openssl req -new -newkey $SIG_ALG -keyout pki/server.key -out server.csr -nodes -subj "/CN=$DOMAIN" -config $LIB_DIR/openssl/apps/openssl.cnf &&
-$LIB_DIR/openssl/apps/openssl x509 -req -in server.csr -out pki/server.crt -CA cacert/CA.crt -CAkey CA.key -CAcreateserial -days 365
+ $LIB_DIR/openssl/apps/openssl req -new -newkey $SIG_ALG -keyout pki/$DOMAIN\_server.key -out $DOMAIN\_server.csr -nodes -subj "/CN=$DOMAIN" -config $LIB_DIR/openssl/apps/openssl.cnf &&
+$LIB_DIR/openssl/apps/openssl x509 -req -in $DOMAIN\_server.csr -out pki/$DOMAIN\_server.crt -CA cacert/CA.crt -CAkey CA.key -CAcreateserial -days 365
 
 
 
@@ -135,11 +136,12 @@ fi
 
 
 ## Input generated certs and other necessary directives into nginx.conf file
-	
-	#Locate file and input parameters for HTTPS server and refference the QOS generated certificate/key (also tthe ecdh_ssl_curve directive) 
 
+ALGOS= 'kyber512:kyber768:sikep434:sikep503:frodo640aes:frodo640shake:bike1l1cpa:bike1l3cpa'
 
+echo 'Using ${ALGOS} as supported key exchange algorithms, but you can visit https://github.com/open-quantum-safe/openssl for a list of all supported algorithms'
 
+	python3 conf_edit.py $PORT $LIB_DIR/pki/$DOMAIN\_server.cert $LIB_DIR/pki/$DOMAIN\_server.key $ALGOS $DOMAIN
 
 # Send signals to NGINX to enforce the upgraded binary and conf files: 
 
@@ -156,13 +158,20 @@ fi
 	MASTER_PID=cat /run/nginx.pid
 	kill -HUP $MASTER_PID
 
+echo 'Congratulations! Your NGINX server is now capable of handling quantum-resistant TLS sessions, which for now is enabled on port ${PORT}'
+echo 'Would you like to run a test with a version of the curl software that supports quantum-resistant algorithms? (y/n)'
 
-## Export 'oqsnginx' as shell command that targets the newly built nginx from sourcefile (in case the user has package nginx installed)
- ### otherwise we just substitute the binaries (shouldnt the migration script do that?) 
+read ANS
 
+if [[ -z $ANS ]]
+then
+	echo 'no answer specified, skipping test..'
+else
+	if $ANS = 'y'
+        echo 'Running curl test...'
+		#Install oqs demo of curl with docker and run test
+	elif $ANS = 'n'
+		echo 'Skipping test..'
+fi
 
 ## --END --
-
-
-
-

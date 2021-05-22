@@ -1,5 +1,3 @@
-## SOURCE --> https://github.com/open-quantum-safe/oqs-demos/blob/main/nginx/fulltest/genconfig.py
-
 ## This script performs the necessary modifications to the nginx.conf file
 
 ## Arguments needed: Port, installation directory for all libs (nginx + OQS openssl)  
@@ -7,19 +5,26 @@
 import common
 import os
 import json
+import fileinput #edit file
+import shutil #copy files/folders
+import re
+import traceback
+import sys
 
 # Script assumes nginx to have been built for this platform using build-ubuntu.sh
 
 ############# Configuration section starting here
-#Conf file location
+#Default nginx.conf file location
 NGX_CONF="/etc/nginx/nginx.conf"
-
 
 # This is where the explanation HTML code is
 TEMPLATE_FILE="index-template"
 
-# This is where nginx is (to be) installed
-BASEPATH="/opt/nginx/"
+# Path where tool was cloned down and this script is running from
+TOOL_PATH = os.path.dirname(os.path.realpath(__file__))
+
+# This is where all libraries are located, default is /opt
+BASEPATH="/opt"
 
 # This is the (relative to BASEPATH) path of all certificates
 PKIPATH="pki"
@@ -28,10 +33,10 @@ PKIPATH="pki"
 STARTPORT=6000
 
 # This is the local location of the OQS-enabled OpenSSL
-OPENSSL="/tmp/opt/openssl/apps/openssl"
+OPENSSL=BASEPATH+"/openssl/apps/openssl"
 
 # This is the local OQS-OpenSSL config file
-OPENSSL_CNF="/tmp/opt/openssl/apps/openssl.cnf"
+OPENSSL_CNF=BASEPATH+"/openssl/apps/openssl.cnf"
 
 # This is the fully-qualified domain name of the server to be set up
 # Ensure this is in sync with contents of ext-csr.conf file
@@ -42,6 +47,9 @@ CAROOTDIR="root"
 
 # This is the file containing the SIG/KEM/port assignments
 ASSIGNMENT_FILE="assignments.json"
+
+#Template server directive file
+SERVER_DIRECTIVE_FILE="/templates/server_directive.txt"
 
 
 ############# Functions starting here
@@ -89,9 +97,116 @@ def gen_cert(sig_alg):
                                   '-extensions', 'v3_req',
                                   '-days', '365'])
 
-#def modify_conf(file, port, cert):
-	
 
+
+
+def line_search(data, strings_to_search, index):
+   for i, line in enumerate(data, index):
+      if all(x in line for x in strings_to_search): 
+	      if '#' in line:  #section is commented out, continue to find a section that isnt
+		      continue
+	      else:
+		      return i, line
+   return None
+
+
+def append_new_server_directive(filename, data, port, server_name, cert, key, algos, html_dir, html_index):
+   try:
+      #create copy of server directive template file
+      tmp_file =  '{}_server_directive.txt'.format(port)
+      shutil.copy(TOOL_PATH+'/templates/server_directive.txt' , tmp_file)
+      #do a search and replace for the values already encoded therin
+      with open(tmp_file, 'r') as file:
+         new_server_directive = file.read()
+         new_server_directive = new_server_directive.replace('PORTTOBESPECIFIED', port)
+         new_server_directive = new_server_directive.replace('SERVERNAMETOBE', server_name)
+         new_server_directive = new_server_directive.replace('SSLCERTTOBESPECIFIED', cert)
+         new_server_directive = new_server_directive.replace('SSLCERTKEYTOBESPECIFIED', key)
+         new_server_directive = new_server_directive.replace('SSLCURVEALGORITHMS', algos)
+         new_server_directive = new_server_directive.replace('ROOTHTMLFILELOCATION', html_dir)
+         new_server_directive = new_server_directive.replace('HTMLFILENAME', html_index)
+
+         #Insert into origin nginx.conf file (data list) right before the last '}' which ends the http directive
+         data[-1:-1] = new_server_directive
+
+      #delete tmp server directive file
+      os.remove(tmp_file)
+      return data
+   except Exception as e:
+	   #print(e)
+      traceback.print_exc()
+
+
+def modify_conf(filename, port, cert, key, algos,  server_name):
+   try:
+      with open(filename, "r") as f:
+         lines = f.readlines()
+         #First check if HTTPS is enabled on the server
+         https_is_enabled = line_search(lines, '443 ssl',0)
+         if https_is_enabled is not None:
+
+            #move on to check if desired port exists
+            port_match = ["listen", port] 
+            port_search_res = line_search(lines, port_match, 0)
+            if port_search_res is not None:
+               print('Port {} is enabled on the server, changing the certificate to a self-signed post-quantum certificate...'.format(port))
+            #find ssl_certificate & ssl_certificate_key directives, input cert and key location
+               cert_search_res = line_search(lines[port_search_res[0]:], 'ssl_certificate', port_search_res[0])
+               if cert_search_res is not None:
+                  #if 'ssl_certificate' directive is found, we input the cert and cert key locations
+                  ssl_certificate = '        ssl_certificate     ' + cert + ';\n'
+                  lines[cert_search_res[0]] = ssl_certificate
+                  ssl_certificate_key = '        ssl_certificate_key     ' + key + ';\n'
+                  lines[cert_search_res[0]+1] = ssl_certificate_key
+               else:
+                  raise Exception('ssl_certificate directive not found, control that you have HTTPS enabled on your server..')
+            # find ssl_ecdh_curve and input desired algos
+               curves = line_search(lines[port_search_res[0]:], 'ssl_ecdh_curve', port_search_res[0])
+               if curves is not None: 
+                  ssl_ecdh_curve = '        ssl_ecdh_curve \' ' + algos + '\';\n'
+                  lines[curves[0]] = ssl_ecdh_curve
+                  with open(filename, "w") as i: 
+                     i.writelines(lines)
+                     i.close()
+               else: 
+                  #input ss_ecdh_curve directive just before 'location' directive
+                  location = line_search(lines[port_search_res[0]:], 'location /', port_search_res[0])
+                  lines[location[0]-1:location[0]-1] = 'ssl_ecdh_curve'
+                  with open(filename, "w") as i: 
+                     i.writelines(lines)
+                     i.close()
+            else: #If we dont find the given port in the conf file, we create a whole new server directive
+               print('Creating new server directive for port {}...'.format(port))
+               new_data = append_new_server_directive(filename, lines, port, server_name, cert, key, algos, TOOL_PATH + '/templates/html', 'index.html index.html')
+               with open(filename, "w") as i: 
+                  i.writelines(new_data)
+                  i.close()
+
+                  """  
+                  #  --- AUTOMATION OF FINDING SERVER NAME BY SCANNING CONF FILE -------
+
+               if server_name is None:
+                  i, str = line_search(lines, 'server_name', 0)
+                  res = re.search('server_name(.*);', str)
+                  server = res.group(1).strip()
+                  #generate new conf file with appended server directive
+                  new_data = append_new_server_directive(filename, lines, port, server, cert, key, algos, TOOL_PATH + '/templates/html', 'index.html index.html')
+                  with open(filename, "w") as i: 
+                     i.writelines(new_data)
+                     i.close()
+               else:
+                  new_data = append_new_server_directive(filename, lines, port, server_name, cert, key, algos, TOOL_PATH + '/templates/html', 'index.html index.html')
+                  with open(filename, "w") as i: 
+                     i.writelines(new_data)
+                     i.close() """
+
+
+         else:
+            raise Exception('Please control that HTTPS is enabled on the server...(Certbot is a good tool for that)')
+
+   except Exception as e:
+	   #print(e)
+      traceback.print_exc()
 
 def write_nginx_config(f, i, port, sig, k):
            f.write("server {\n")
@@ -186,11 +301,10 @@ def gen_conf(filename, indexbasefilename):
       json.dump(assignments, outfile)
 
 def main():
-   # first generate certs for all supported sig algs:
-   # for sig in common.signatures:
-   gen_cert(sig)
-   # now do conf and index-base file
-  # gen_conf("interop.conf", "index-base.html")
-    modify_conf(NGX_CONF)
+   #modify_conf(TOOL_PATH + '/test.conf','9003', 'v2/example.com/cert.pem','v2/example.com/cert.key' ,'kyber512:kyber768:kyber1024', 'www.quantumsafenginx.com quantumsafenginx.com')
+   modify_conf('/etc/nginx/nginx.conf', sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+  # If the argument at [1] is a '1' it means the user wants to retain their certs on that port
+
+  # If the argument at [1] is a '2' then it means that the user wants to override the cert already defined for that port
 
 main()
