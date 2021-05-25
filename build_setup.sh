@@ -80,10 +80,12 @@ else
 	cd $LIB_DIR && get_nginx
 fi
 
+
+get_dependencies
+
+
 ## Build liboqs 
 cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PARAM -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs .. && ninja && ninja install 
-
-
 
 
 # Retrieve current NGINX config arguments, append arguments for redirect openssl to OQS openssl
@@ -95,7 +97,7 @@ echo $my_command
 
 
 ## Build nginx (will also build OQS-openssl) 
-cd LIB_DIR/nginx-$NGINX_VER && ./configure $my_command --with-debug --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --without-http_gzip_module --with-cc-opt=-I$LIB_DIR/openssl/oqs/include --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" --without-http-rewrite_module && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install &&
+cd $LIB_DIR/nginx-$NGINX_VER && ./configure $my_command --with-debug --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --without-http_gzip_module --with-cc-opt=-I$LIB_DIR/openssl/oqs/include --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" --without-http-rewrite_module && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install &&
 
 #upgrade new binary file
 sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
