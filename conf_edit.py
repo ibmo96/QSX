@@ -102,8 +102,8 @@ def gen_cert(sig_alg):
 
 def line_search(data, strings_to_search, index):
    for i, line in enumerate(data, index):
-      if all(x in line for x in strings_to_search): 
-	      if '#' in line:  #section is commented out, continue to find a section that isnt
+      if all(x in line for x in strings_to_search):
+	      if line.strip().startswith("#", beg=0, end=len(line)));  #section is commented out, continue to find a section that isnt
 		      continue
 	      else:
 		      return i, line
