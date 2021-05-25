@@ -2,7 +2,9 @@ The primary authors are:
 
     Ibrahim Louay Abdallah Mohammad
     Helene Anne Burghoff 
+    
+Making use of the Open Quantum Safe project by Douglas Stebila et.al.
 
 Created in cooperation with the IT-University of Copenhagen
-Msc. thesis in "Migrating Web Servers to Quantum-Safe TLS"
+Msc. thesis in "Migrating Nginx Web Servers to Quantum-Safe TLS"
 Software Design class of 2021. 
