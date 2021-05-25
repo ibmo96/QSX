@@ -44,8 +44,11 @@ SIG_ALG='dilithium2'
 #USER INPUT FOR VARIABLES
 
 echo 'This is the setup script for the OQS-MOFF tool!'
-echo 'Please make sure you are on root user, as some dependencies are needed and will be installed' 
-echo 'Specify a directory for installing liboqs, openssl and nginx sourcefiles, if you dont wish so press enter and they will be installed in /opt"' 
+echo 'Please make sure you are on root user, as some necessary dependencies will be installed' 
+
+#Liboqs directory
+
+echo 'Specify a directory for installing liboqs, openssl and nginx sourcefiles. If you dont wish to, press enter and they will be installed in /opt"' 
 
 read DIR_RES
 
@@ -55,10 +58,13 @@ then
 	#test_echo
 else
 	LIB_DIR=$DIR_RES
-        echo 'working directory is set to: ${LIB_DIR}'
 	cd $LIB_DIR && get_libs
 	#test_echo
 fi
+
+echo 'working directory is set to: ${LIB_DIR}'
+
+#Nginx Version
 
 echo 'Input the desired NGINX version in the following format: \"1.xx.x\", else press enter and version 1.18.0 will be used'
 
@@ -74,10 +80,12 @@ else
 	cd $LIB_DIR && get_nginx
 fi
 
+
+get_dependencies
+
+
 ## Build liboqs 
 cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PARAM -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs .. && ninja && ninja install 
-
-
 
 
 # Retrieve current NGINX config arguments, append arguments for redirect openssl to OQS openssl
@@ -89,7 +97,7 @@ echo $my_command
 
 
 ## Build nginx (will also build OQS-openssl) 
-cd LIB_DIR/nginx-$NGINX_VER && ./configure $my_command --with-debug --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --without-http_gzip_module --with-cc-opt=-I$LIB_DIR/openssl/oqs/include --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" --without-http-rewrite_module && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install &&
+cd $LIB_DIR/nginx-$NGINX_VER && ./configure $my_command --with-debug --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --without-http_gzip_module --with-cc-opt=-I$LIB_DIR/openssl/oqs/include --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" --without-http-rewrite_module && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install &&
 
 #upgrade new binary file
 sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
