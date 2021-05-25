@@ -35,8 +35,7 @@ echo "dir variable is set to: $LIB_DIR"
 # variables for directories and build params:
 
 LIB_DIR='/opt'
-  ## NGINX VERSION (please specify the latest stable version, currently this tool is experiencing compatability issues with the  mainline version)
-NGINX_VER='1.18.0'
+NGINX_VER=$(nginx -V  2>&1 | grep 'nginx version:' | awk '{print $2}' FS='nginx version: nginx/')
 MAKE_PARAM='-j 2'
 LIBOQS_BUILD_PARAM ='-DOQS_DIST_BUILD=ON'
 SIG_ALG='dilithium2'
@@ -64,25 +63,8 @@ fi
 
 echo 'working directory is set to: ${LIB_DIR}'
 
-#Nginx Version
-
-echo 'Input the desired NGINX version in the following format: \"1.xx.x\", else press enter and version 1.18.0 will be used'
-
-read VER_RES
-
-if [[ -z $VER_RES ]]
-then
-	echo 'using nginx version:  $NGINX_VER'
-	get_nginx
-else
-	NGINX_VER=$VER_RES
-	echo 'nginx ver is set to: $NGINX_VER'
-	cd $LIB_DIR && get_nginx
-fi
-
-
 get_dependencies
-
+get_nginx
 
 ## Build liboqs 
 cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PARAM -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs .. && ninja && ninja install 
@@ -93,11 +75,13 @@ cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PA
 echo 'Retrieving current NGINX configuration arguments...'
 
 my_command=$(nginx -V  2>&1 | grep 'configure arguments:' | awk '{print $2}' FS='configure arguments:')
-echo $my_command
 
+#input OQS openssl compiler refference in nginx configure arguments
+my_command=$(sed "s/--with-cc-opt='/--with-cc-opt='-I$LIB_DIR/openssl/oqs/include /"<<< $my_command)
+my_command=$(sed "s/--with-ld-opt='/--with-ld-opt='-L$LIB_DIR/openssl/oqs/lib/"<<< $my_command)
 
-## Build nginx (will also build OQS-openssl) 
-cd $LIB_DIR/nginx-$NGINX_VER && ./configure $my_command --with-debug --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --without-http_gzip_module --with-cc-opt=-I$LIB_DIR/openssl/oqs/include --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" --without-http-rewrite_module && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install &&
+## Build nginx (will also build OQS-openssl)
+cd $LIB_DIR/nginx-$NGINX_VER && ./configure --with-openssl=$LIB_DIR/openssl $my_command && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
 
 #upgrade new binary file
 sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
@@ -107,18 +91,6 @@ sudo mv /usr/local/nginx/sbin/nginx /usr/sbin/nginx
 # Get domain-name (credit: https://gist.github.com/Tucker-Eric/c9341e1e75aac3213963a17018a1b6e0) 
 echo "What is the domain you would like to generate a quantum-safe certificate for?"
 read DOMAIN
-
-'''
-# check the domain is valid!   
-PATTERN="^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$";
-if [[ "$DOMAIN" =~ $PATTERN ]]; then
-	DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
-	echo "Creating hosting for:" $DOMAIN
-else
-	echo "invalid domain name"
-	exit 1
-fi
-'''
 
 ## Create test certificate using OQS domain
 set -x #prints executed commands 
