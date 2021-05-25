@@ -9,7 +9,7 @@
 ## Dependencies needed
 
 function get_dependencies {
-	sudo apt install cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip
+	sudo apt install cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip libpcre3 libpcre3-dev
 	
 	pip install common
 }
