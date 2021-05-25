@@ -45,6 +45,9 @@ SIG_ALG='dilithium2'
 
 echo 'This is the setup script for the OQS-MOFF tool!'
 echo 'Please make sure you are on root user, as some necessary dependencies will be installed' 
+
+#Liboqs directory
+
 echo 'Specify a directory for installing liboqs, openssl and nginx sourcefiles. If you dont wish to, press enter and they will be installed in /opt"' 
 
 read DIR_RES
@@ -55,10 +58,13 @@ then
 	#test_echo
 else
 	LIB_DIR=$DIR_RES
-        echo 'working directory is set to: ${LIB_DIR}'
 	cd $LIB_DIR && get_libs
 	#test_echo
 fi
+
+echo 'working directory is set to: ${LIB_DIR}'
+
+#Nginx Version
 
 echo 'Input the desired NGINX version in the following format: \"1.xx.x\", else press enter and version 1.18.0 will be used'
 
