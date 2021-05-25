@@ -99,11 +99,19 @@ def gen_cert(sig_alg):
 
 
 
+def rev_line_search(data, strings_to_search, index): 
+   for i,line in reversed(list(enumerate(data))): 
+       if all(x in line for x in strings_to_search): 
+	      if line.strip().startswith("#"):
+		      continue
+	      else:
+		      return i,line
+   return None
 
 def line_search(data, strings_to_search, index):
    for i, line in enumerate(data, index):
       if all(x in line for x in strings_to_search):
-	      if line.strip().startswith("#");  #section is commented out, continue to find a section that isnt
+	      if line.strip().startswith("#"):  #section is commented out, continue to find a section that isnt
 		      continue
 	      else:
 		      return i, line
@@ -127,7 +135,8 @@ def append_new_server_directive(filename, data, port, server_name, cert, key, al
          new_server_directive = new_server_directive.replace('HTMLFILENAME', html_index)
 
          #Insert into origin nginx.conf file (data list) right before the last '}' which ends the http directive
-         data[-1:-1] = new_server_directive
+        res = rev_line_search(data, "}", 0)
+	data[res[0]:res[0]] = new_server_directive
 
       #delete tmp server directive file
       os.remove(tmp_file)
@@ -304,7 +313,7 @@ def main():
    #modify_conf(TOOL_PATH + '/test.conf','9003', 'v2/example.com/cert.pem','v2/example.com/cert.key' ,'kyber512:kyber768:kyber1024', 'www.quantumsafenginx.com quantumsafenginx.com')
    modify_conf('/etc/nginx/nginx.conf', sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
   # If the argument at [1] is a '1' it means the user wants to retain their certs on that port
-
+#append_new_server_directive('/etc/nginx/nginx.conf', None, , server_name, cert, key, algos, html_dir, html_index)
   # If the argument at [1] is a '2' then it means that the user wants to override the cert already defined for that port
 
 main()
