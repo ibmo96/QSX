@@ -130,7 +130,7 @@ $LIB_DIR/openssl/apps/openssl x509 -req -in $DOMAIN\_server.csr -out pki/$DOMAIN
 
 
 # Read which port user wants to run quantum-safe server on
-echo "What port would you like the quantum-safe server to listen on? You can specify either an already used port and we will simply exchange the certificate, or an unused port"
+echo "What port would you like the quantum-safe server to listen on? You can specify either an already used port and we will update the certificate, or an unused port. If you are unsure, press enter and port 443 will be used."
 PORT=443
 read TMP_PORT
 
