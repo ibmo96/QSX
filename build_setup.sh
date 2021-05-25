@@ -44,8 +44,8 @@ SIG_ALG='dilithium2'
 #USER INPUT FOR VARIABLES
 
 echo 'This is the setup script for the OQS-MOFF tool!'
-echo 'Please make sure you are on root user, as some dependencies are needed and will be installed' 
-echo 'Specify a directory for installing liboqs, openssl and nginx sourcefiles, if you dont wish so press enter and they will be installed in /opt"' 
+echo 'Please make sure you are on root user, as some necessary dependencies will be installed' 
+echo 'Specify a directory for installing liboqs, openssl and nginx sourcefiles. If you dont wish to, press enter and they will be installed in /opt"' 
 
 read DIR_RES
 
