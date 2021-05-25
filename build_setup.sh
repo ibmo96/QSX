@@ -147,7 +147,7 @@ fi
 
 ALGOS= 'kyber512:kyber768:sikep434:sikep503:frodo640aes:frodo640shake:bike1l1cpa:bike1l3cpa'
 
-echo 'Using ${ALGOS} as supported key exchange algorithms, but you can visit https://github.com/open-quantum-safe/openssl for a list of all supported algorithms'
+echo 'This Nginx reconfiguration supports following algorithms for key exchange: ${ALGOS}. You can visit https://github.com/open-quantum-safe/openssl for a list of all supported algorithms'
 
 	python3 conf_edit.py $PORT $LIB_DIR/pki/$DOMAIN\_server.cert $LIB_DIR/pki/$DOMAIN\_server.key $ALGOS $DOMAIN
 
