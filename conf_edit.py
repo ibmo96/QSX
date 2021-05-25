@@ -99,14 +99,15 @@ def gen_cert(sig_alg):
 
 
 
-def rev_line_search(data, strings_to_search, index): 
-   for i,line in reversed(list(enumerate(data))): 
-       if all(x in line for x in strings_to_search): 
-	      if line.strip().startswith("#"):
+def rev_line_search(data, strings_to_search, index):
+   for i, line in reversed(list(enumerate(data))):
+      if all(x in line for x in strings_to_search):
+	      if line.strip().startswith("#"):  #section is commented out, continue to find a section that isnt
 		      continue
 	      else:
-		      return i,line
+		      return i, line
    return None
+
 
 def line_search(data, strings_to_search, index):
    for i, line in enumerate(data, index):
