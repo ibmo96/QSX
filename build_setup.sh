@@ -79,6 +79,7 @@ my_command=$(nginx -V  2>&1 | grep 'configure arguments:' | awk '{print $2}' FS=
 #input OQS openssl compiler refference in nginx configure arguments
 my_command=$(sed "s/--with-cc-opt='/--with-cc-opt='-I$LIB_DIR/openssl/oqs/include /"<<< $my_command)
 my_command=$(sed "s/--with-ld-opt='/--with-ld-opt='-L$LIB_DIR/openssl/oqs/lib/"<<< $my_command)
+my_command=$(sed "s/\--add-dynamic-module.*//" <<< $my_command) #omits dynamic modules is they can cause issues when configuring
 
 ## Build nginx (will also build OQS-openssl)
 cd $LIB_DIR/nginx-$NGINX_VER && ./configure --with-openssl=$LIB_DIR/openssl $my_command && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
