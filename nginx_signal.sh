@@ -21,5 +21,5 @@ echo "Reloading Nginx configuration..."
 	kill -HUP $MASTER_PID
 
 echo ""
-echo "Nginx signals sent sucessfully!"
+echo "Nginx signals sent successfully!"
 echo "
