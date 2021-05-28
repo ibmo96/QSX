@@ -26,12 +26,6 @@ function get_nginx {
 }
 
 
-function test_echo {
-echo "dir variable is set to: $LIB_DIR"
-
-}
-
-
 # variables for directories and build params:
 
 LIB_DIR='/opt'
@@ -109,10 +103,8 @@ select yn in "Yes" "No"; do
     esac
 done
 
-echo ""
-echo "Sending Nginx signals to gracefully upgrade your Nginx binary/configuration...."
+# Send Nginx sourcefiles
 source nginx_signal.sh
-
 
 
 echo ""
