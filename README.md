@@ -27,8 +27,9 @@ On the build machine run the following to download and build the necessary depen
 ./build_setup.sh
 ```
 
-Once successfully built, go ahead and run the gen
+Once successfully built, the build script will ask for optional certificate generation using the `gen_cert.sh` script. `gen_cert.sh` will then edit the `nginx.conf` file using `conf_edit.py`. Finally `./build_setup.sh` calls `nginx_signal.sh` which will send the `USR2` and `HUP` signals to the Nginx master process. Documentation on Nginx processes can be found [here](http://nginx.org/en/docs/control.html)
 
-```
 
-```
+### TESTING
+
+
