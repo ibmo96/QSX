@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Copyright (C) OQX.
-
 #Script to setup prerequesites for an OQS-enabled NGINX server - for DEBIAN-based systems.
 
 # FUNCTIONS
