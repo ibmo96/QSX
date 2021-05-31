@@ -17,6 +17,11 @@ This is the official QSX tool for setting up and prototpying a quantum-secure NG
 - The tool provides a test script for generating a quantum-secure self-signed (or part of a chain) certificate.
 
 
+## Prerquesites 
+- Debian/Ubuntu machine. 
+- Having an Nginx installation of >=14.1.2
+- For enabling a post-quantum  endpoint you should already have HTTPS enabled ([Certbot](https://github.com/certbot/certbot) is a great tool to enable HTTPS on Nginx.
+
 ### HOWTO
 
 #### 1: Setup 
@@ -27,9 +32,15 @@ On the build machine run the following to download and build the necessary depen
 ./build_setup.sh
 ```
 
-Once successfully built, the build script will ask for optional certificate generation using the `gen_cert.sh` script. `gen_cert.sh` will then edit the `nginx.conf` file using `conf_edit.py`. Finally `./build_setup.sh` calls `nginx_signal.sh` which will send the `USR2` and `HUP` signals to the Nginx master process. Documentation on Nginx processes can be found [here](http://nginx.org/en/docs/control.html)
+Once successfully built, the build script will ask for optional certificate generation using the `gen_cert.sh` script. 
+
+If HTTPS is enabled then `gen_cert.sh` will edit the `nginx.conf` file using `conf_edit.py`. Finally `./build_setup.sh` calls `nginx_signal.sh` which will send the `USR2` and `HUP` signals to the Nginx master process. Documentation on Nginx processes can be found [here](http://nginx.org/en/docs/control.html)
 
 
 ### TESTING
 
+If a self-signed certificate was generated and a post-quantum endpoint/port was created, then this port can be tested with a post-quantum TLS session using one of two tools. 
+1. Requesting the certificate from the server using the built in OpenSSL `s_client` by running the following: 
 
+    `apps/openssl s_client -connect host:port-curves <KEM>`
+2. Requesting a page from server on that port using an OQS modified version of curl. Installation and usage can be found [here](https://github.com/open-quantum-safe/oqs-demos/tree/main/curl).
