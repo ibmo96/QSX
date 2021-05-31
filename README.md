@@ -43,4 +43,7 @@ If a self-signed certificate was generated and a post-quantum endpoint/port was 
 1. Requesting the certificate from the server using the built in OpenSSL `s_client` by running the following: 
 
     `apps/openssl s_client -connect host:port-curves <KEM>`
+ 
+    List of supported algorithms that can be passed to `<KEM>` are the following default algorithms:        `kyber512:kyber768:sikep434:sikep503:frodo640aes:frodo640shake:bike1l1cpa:bike1l3cpa'
+   
 2. Requesting a page from server on that port using an OQS modified version of curl. Installation and usage can be found [here](https://github.com/open-quantum-safe/oqs-demos/tree/main/curl).
