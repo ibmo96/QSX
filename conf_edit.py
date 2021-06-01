@@ -152,7 +152,8 @@ def modify_conf(filename, port, cert, key, algos,  server_name):
       with open(filename, "r") as f:
          lines = f.readlines()
          #First check if HTTPS is enabled on the server
-         https_is_enabled = line_search(lines, '443 ssl',0)
+	 https_check = ["listen","ssl]
+         https_is_enabled = line_search(lines, https_check,0)
          if https_is_enabled is not None:
 
             #move on to check if desired port exists
