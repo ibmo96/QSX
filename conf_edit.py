@@ -136,7 +136,7 @@ def append_new_server_directive(filename, data, port, server_name, cert, key, al
          new_server_directive = new_server_directive.replace('HTMLFILENAME', html_index)
 
          #Insert into origin nginx.conf file (data list) right before the last '}' which ends the http directive
-        res = rev_line_search(data, "}", 0)
+        res = rev_line_search(data, "}",0)
 	data[res[0]:res[0]] = new_server_directive
 
       #delete tmp server directive file

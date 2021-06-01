@@ -9,12 +9,26 @@ echo ""
 read DOMAIN
 
 ## Create test certificate using OQS domain
-set -x #prints executed commands 
-cd $LIB_DIR && mkdir cacert & mkdir pki && 
-$LIB_DIR/openssl/apps/openssl req -x509 -new -newkey $SIG_ALG -keyout CA.key -out cacert/CA.crt -nodes -subj "/CN=$DOMAIN" -days 365 -config $LIB_DIR/openssl//apps/openssl.cnf && 
- $LIB_DIR/openssl/apps/openssl req -new -newkey $SIG_ALG -keyout pki/$DOMAIN\_server.key -out $DOMAIN\_server.csr -nodes -subj "/CN=$DOMAIN" -config $LIB_DIR/openssl/apps/openssl.cnf &&
-$LIB_DIR/openssl/apps/openssl x509 -req -in $DOMAIN\_server.csr -out pki/$DOMAIN\_server.crt -CA cacert/CA.crt -CAkey CA.key -CAcreateserial -days 365
 
+#if [ -d "$LIB_DIR/cacert" ] 
+#then
+ #   echo "Directory $LIB_DIR/cacert already exists, overriding any existing certificate.." 
+#else
+ #  cd $LIB_DIR && mkdir cacert && mkdir pki
+  #  echo "Generating certificates.."
+#fi
+
+set -x #prints executed commands 
+
+cd $LIB_DIR && mkdir -p cacert & mkdir -p pki &&
+cd $LIB_DIR/openssl/apps &&
+
+#function gen_cert{ 
+./openssl req -x509 -new -newkey $SIG_ALG -keyout $LIB_DIR/cacert/CA.key -out $LIB_DIR/cacert/CA.crt -nodes -subj "/CN=$DOMAIN" -days 365 -config openssl.cnf && 
+./openssl req -new -newkey $SIG_ALG -keyout $LIB_DIR/pki/$DOMAIN\_server.key -out $LIB_DIR/pki/$DOMAIN\_server.csr -nodes -subj "/CN=$DOMAIN" -config openssl.cnf &&
+./openssl x509 -req -in $LIB_DIR/pki/$DOMAIN\_server.csr -out $LIB_DIR/pki/$DOMAIN\_server.crt -CA $LIB_DIR/cacert/CA.crt -CAkey $LIB_DIR/cacert/CA.key -CAcreateserial -days 365
+#}
+set +x #turns off printing of executed commands
 
 # Read which port user wants to run quantum-safe server on
 echo ""
@@ -38,10 +52,10 @@ fi
 
 ## Input generated certs and other necessary directives into nginx.conf file
 
-ALGOS= 'kyber512:kyber768:sikep434:sikep503:frodo640aes:frodo640shake:bike1l1cpa:bike1l3cpa'
+ALGOS='kyber512:kyber768:sikep434:sikep503:frodo640aes:frodo640shake:bike1l1cpa:bike1l3cpa'
 
 echo "=================================================================="
 echo 'This Nginx reconfiguration supports following algorithms for key exchange: ${ALGOS}. You can visit https://github.com/open-quantum-safe/openssl for a list of all supported algorithms'
 echo "=================================================================="
 echo ""
-	python3 conf_edit.py $PORT $LIB_DIR/pki/$DOMAIN\_server.cert $LIB_DIR/pki/$DOMAIN\_server.key $ALGOS $DOMAIN
+	python3 $TOOL_DIR/conf_edit.py $PORT $LIB_DIR/pki/$DOMAIN\_server.cert $LIB_DIR/pki/$DOMAIN\_server.key $ALGOS $DOMAIN

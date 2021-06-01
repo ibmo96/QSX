@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 #Script to setup prerequesites for an OQS-enabled NGINX server - for DEBIAN-based systems.
@@ -14,6 +15,9 @@ function get_dependencies {
 
 ## Clone down liboqs and OQS-OpenSSL
 function get_libs {
+    echo ""
+    echo "Cloning down OQS libraries..."
+    echo ""
     git clone --branch OQS-OpenSSL_1_1_1-stable https://github.com/open-quantum-safe/openssl.git
     git clone --branch main https://github.com/open-quantum-safe/liboqs.git
 }
@@ -23,13 +27,14 @@ function get_nginx {
     wget nginx.org/download/nginx-$NGINX_VER.tar.gz && tar -zxvf nginx-$NGINX_VER.tar.gz;
 }
 
-
 # variables for directories and build params:
 
+TOOL_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+echo $TOOL_DIR
 LIB_DIR='/opt'
 NGINX_VER=$(nginx -V  2>&1 | grep 'nginx version:' | awk '{print $2}' FS='nginx version: nginx/')
 MAKE_PARAM='-j 2'
-LIBOQS_BUILD_PARAM ='-DOQS_DIST_BUILD=ON'
+LIBOQS_BUILD_PARAM='-DOQS_DIST_BUILD=ON'
 SIG_ALG='dilithium2'
 
 #USER INPUT FOR VARIABLES
@@ -62,11 +67,13 @@ fi
 
 echo 'working directory is set to: ${LIB_DIR}'
 
-get_dependencies
-get_nginx
+#get_dependencies
+#get_nginx
 
+echo ""
+echo "Building liboqs..."
 ## Build liboqs 
-cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PARAM -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs .. && ninja && ninja install 
+#cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PARAM -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs .. && ninja && ninja install 
 
 
 # Retrieve current NGINX config arguments, append arguments for redirect openssl to OQS openssl
@@ -75,34 +82,34 @@ cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PA
 echo ""
 echo 'Retrieving current NGINX configuration arguments...'
 
-my_command=$(nginx -V  2>&1 | grep 'configure arguments:' | awk '{print $2}' FS='configure arguments:')
+#my_command=$(nginx -V  2>&1 | grep 'configure arguments:' | awk '{print $2}' FS='configure arguments:')
 
 #input OQS openssl compiler refference in nginx configure arguments
-my_command=$(sed "s/--with-cc-opt='/--with-cc-opt='-I$LIB_DIR/openssl/oqs/include /"<<< $my_command)
-my_command=$(sed "s/--with-ld-opt='/--with-ld-opt='-L$LIB_DIR/openssl/oqs/lib/"<<< $my_command)
-my_command=$(sed "s/\--add-dynamic-module.*//" <<< $my_command) #omits dynamic modules is they can cause issues when configuring
+#my_command=$(sed "s|--with-cc-opt='|--with-cc-opt='-I$LIB_DIR/openssl/oqs/include|"<<< $my_command)
+#my_command=$(sed "s|--with-ld-opt='|--with-ld-opt='-L$LIB_DIR/openssl/oqs/lib|"<<< $my_command)
+#my_command=$(sed "s|--add-dynamic-module.*||" <<< $my_command) #omits dynamic modules is they can cause issues when configuring
 
 ## Build nginx (will also build OQS-openssl)
-cd $LIB_DIR/nginx-$NGINX_VER && ./configure --with-openssl=$LIB_DIR/openssl $my_command && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
+#cd $LIB_DIR/nginx-$NGINX_VER && ./configure "$my_command" && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
 
 #upgrade new binary file
-sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
-sudo mv /usr/local/nginx/sbin/nginx /usr/sbin/nginx
+#sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
+#sudo mv /usr/local/nginx/sbin/nginx /usr/sbin/nginx
 
-
+echo "Tool dir is: $TOOL_DIR"
 echo ""
 echo "=================================================================="
 echo "Do you wish to generate a post-quantum certificate (self-signed)?"
 echo "=================================================================="
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) source gen_cert.sh; break;;
+        Yes ) source $TOOL_DIR/gen_cert.sh; break;;
         No ) exit;;
     esac
 done
 
 # Send Nginx sourcefiles
-source nginx_signal.sh
+source $TOOL_DIR/nginx_signal.sh
 
 
 echo ""
