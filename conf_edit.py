@@ -152,7 +152,7 @@ def modify_conf(filename, port, cert, key, algos,  server_name):
       with open(filename, "r") as f:
          lines = f.readlines()
          #First check if HTTPS is enabled on the server
-         https_check = ["listen","ssl]
+         https_check = ["listen","ssl"]
          https_is_enabled = line_search(lines, https_check,0)
          if https_is_enabled is not None:
 
@@ -188,7 +188,7 @@ def modify_conf(filename, port, cert, key, algos,  server_name):
                      i.close()
             else: #If we dont find the given port in the conf file, we create a whole new server directive
                print('Creating new server directive for port {}...'.format(port))
-               new_data = append_new_server_directive(filename, lines, port, server_name, cert, key, algos, TOOL_PATH + '/templates/html', 'index.html index.html')
+               new_data = append_new_server_directive(filename, lines, port, server_name, cert, key, algos, TOOL_PATH + '/templates/html', 'qsx_template.html qsx_template.htm')
                with open(filename, "w") as i: 
                   i.writelines(new_data)
                   i.close()

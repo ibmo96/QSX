@@ -1,7 +1,7 @@
 # MANAGED BY QSX
  server {
         listen       PORTTOBESPECIFIED ssl;
-         server_name  ;
+         server_name  SERVERNAMETOBE;
 
         ssl_certificate      SSLCERTTOBESPECIFIED;
         ssl_certificate_key  SSLCERTKEYTOBESPECIFIED;
