@@ -34,7 +34,7 @@ echo $TOOL_DIR
 LIB_DIR='/opt'
 NGINX_VER=$(nginx -V  2>&1 | grep 'nginx version:' | awk '{print $2}' FS='nginx version: nginx/')
 MAKE_PARAM='-j 2'
-LIBOQS_BUILD_PARAM='-DOQS_DIST_BUILD=ON'
+LIBOQS_BUILD_PARAM='-DOQS_DIST_BUILD=ON -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs ..'
 SIG_ALG='dilithium2'
 
 #USER INPUT FOR VARIABLES
@@ -73,7 +73,7 @@ echo 'working directory is set to: ${LIB_DIR}'
 echo ""
 echo "Building liboqs..."
 ## Build liboqs 
-cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" LIBOQS_BUILD_PARAM -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs .. && ninja && ninja install 
+cd $LIB_DIR/liboqs && mkdir build && cd build && cmake -G"Ninja" $LIBOQS_BUILD_PARAM && ninja && ninja install 
 
 
 # Retrieve current NGINX config arguments, append arguments for redirect openssl to OQS openssl
