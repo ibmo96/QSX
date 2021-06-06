@@ -28,9 +28,8 @@ This is the official QSX tool for setting up and prototpying a quantum-secure NG
 
 On the build machine run the following to download and build the necessary dependencies and libraries: 
 
-```
-./build_setup.sh
-```
+
+```sudo bash build_setup.sh ``` or ```./build_setup.sh```
 
 Once successfully built, the build script will ask for optional certificate generation using the `gen_cert.sh` script. 
 
