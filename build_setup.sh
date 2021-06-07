@@ -49,7 +49,7 @@ function get_nginx {
 TOOL_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 echo $TOOL_DIR
 LIB_DIR='/opt'
-NGINX_VER=$(nginx -V  2>&1 | grep 'nginx version:' | awk '{print $2}' FS='nginx version: nginx/')
+NGINX_VER=$(nginx -V  2>&1 | grep 'nginx version:' | awk '{print $2}' FS='nginx version: nginx/' | sed 's/\s.*$//')
 MAKE_PARAM='-j 2'
 LIBOQS_BUILD_PARAM='-DOQS_DIST_BUILD=ON -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs ..'
 SIG_ALG='dilithium2'
