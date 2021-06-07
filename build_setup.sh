@@ -135,7 +135,7 @@ echo "=================================================================="
 select yn in "Yes" "No"; do
     case $yn in
         Yes ) source $TOOL_DIR/gen_cert.sh; break;;
-        No ) exit;;
+        No ) break;;
     esac
 done
 
