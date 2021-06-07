@@ -127,7 +127,6 @@ cd $LIB_DIR/nginx-$NGINX_VER && ./configure --prefix=/usr/share/nginx --pid-path
 sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
 sudo mv /usr/share/nginx/sbin/nginx /usr/sbin/nginx
 
-echo "Tool dir is: $TOOL_DIR"
 echo ""
 echo "=================================================================="
 echo "Do you wish to generate a post-quantum certificate (self-signed)?"
