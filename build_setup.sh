@@ -25,7 +25,11 @@ fi
 
 ## Dependencies needed
 function get_dependencies {
-	sudo apt-get install cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip libpcre3 libpcre3-dev -y || exit 1
+	INSTALL_PKGS="cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip libpcre3 libpcre3-dev"
+        for i in $INSTALL_PKGS; do
+  		sudo apt-get install -y $i
+	done
+	
 	wget sourceforge.net/projects/libpng/files/zlib/1.2.9/zlib-1.2.9.tar.gz && tar -xvf zlib-1.2.9.tar.gz && cd zlib-1.2.9 && ./configure && make && make install && cd /lib/x86_64-linux-gnu && ln -s -f /usr/local/lib/libz.so.1.2.9/lib libz.so.1 && cd ~ && rm -rf zlib-1.2.9 || exit 1
 	pip3 install common
 }
@@ -73,7 +77,7 @@ else
 	#test_echo
 fi
 
-get_dependencies
+get_dependencies || exit 1
 get_nginx
 
 echo ""
