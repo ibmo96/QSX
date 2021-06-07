@@ -124,7 +124,7 @@ my_command=$(sed "s|--add-dynamic-module.*||" <<< $my_command) #omits dynamic mo
 
 ## Build nginx (will also build OQS-openssl)
 #cd $LIB_DIR/nginx-$NGINX_VER && ./configure "${configure_arguments[*]}" && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
-cd $LIB_DIR/nginx-$NGINX_VER && ./configure --prefix=/usr/share/nginx/sbin/nginx --conf-path=/etc/nginx/nginx.conf --with-openssl=$LIB_DIR/openssl --with-cc-opt='-I$LIB_DIR/openssl/oqs/include' --with-ld-opt='-L$LIB_DIR/openssl/oqs/lib' && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
+cd $LIB_DIR/nginx-$NGINX_VER && ./configure --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --with-openssl=$LIB_DIR/openssl --with-cc-opt='-I$LIB_DIR/openssl/oqs/include' --with-ld-opt='-L$LIB_DIR/openssl/oqs/lib' && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
 
 #upgrade new binary file 
 sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
