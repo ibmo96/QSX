@@ -18,9 +18,8 @@ read DOMAIN
   #  echo "Generating certificates.."
 #fi
 
-set -x #prints executed commands 
 
-cd $LIB_DIR && mkdir -p cacert & mkdir -p pki &&
+cd $LIB_DIR && mkdir -p cacert && mkdir -p pki && set -x #prints executed commands  &&
 cd $LIB_DIR/openssl/apps &&
 
 #function gen_cert{ 
