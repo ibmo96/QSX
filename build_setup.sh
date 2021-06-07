@@ -25,9 +25,9 @@ fi
 
 ## Dependencies needed
 function get_dependencies {
-	sudo apt install cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip libpcre3 libpcre3-dev
-	
-	pip install common
+	sudo apt install cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip libpcre3 libpcre3-dev || exit 1
+	wget sourceforge.net/projects/libpng/files/zlib/1.2.9/zlib-1.2.9.tar.gz && tar -xvf zlib-1.2.9.tar.gz && cd zlib-1.2.9 && ./configure && make && make install || exit 1
+	pip3 install common
 }
 
 ## Clone down liboqs and OQS-OpenSSL
