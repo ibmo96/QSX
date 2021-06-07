@@ -13,14 +13,15 @@ This is the official QSX tool for setting up and prototpying a quantum-secure NG
 
 - QSX builds and configures NGINX using quantum-secure version of [OpenSSL](https://github.com/open-quantum-safe/openssl).
 - The appends necessary build parameters to the NGINX configuration arguments, to the user's already existing configuration arguments. 
-- NGINX is configured to use HTTPS to enabled SSL, with TLS version 1.3.
+- NGINX is configured to use HTTPS to enable SSL, using TLS version 1.3.
 - The tool provides a test script for generating a quantum-secure self-signed (or part of a chain) certificate.
 
 
-## Prerquesites 
+## Prerequesites 
 - Debian/Ubuntu machine. 
+- Root user.
 - Having an Nginx installation of >=14.1.2
-- For enabling a post-quantum  endpoint you should already have HTTPS enabled ([Certbot](https://github.com/certbot/certbot) is a great tool to enable HTTPS on Nginx.
+- For enabling a post-quantum endpoint you should already have HTTPS enabled ([Certbot](https://github.com/certbot/certbot) is a great tool to enable HTTPS on Nginx.
 
 ### HOWTO
 
