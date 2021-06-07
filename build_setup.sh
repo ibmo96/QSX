@@ -97,10 +97,10 @@ concat_commands=$(echo $my_command | sed 's|--|\n|g')
 counter=1 #start at 1, 0 is whitespace
 readarray -t array <<<"$concat_commands"
 
-found_prefix=false
-found_conf=false
-found_cc_opt=false
-found_ld_opt=false
+#found_prefix=false
+#found_conf=false
+#found_cc_opt=false
+#found_ld_opt=false
 
 #make sure prefix is set to share/usr/nginx
 
@@ -124,7 +124,7 @@ my_command=$(sed "s|--add-dynamic-module.*||" <<< $my_command) #omits dynamic mo
 
 ## Build nginx (will also build OQS-openssl)
 #cd $LIB_DIR/nginx-$NGINX_VER && ./configure "${configure_arguments[*]}" && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
-cd $LIB_DIR/nginx-$NGINX_VER && ./configure ..prefix=/usr/share/nginx/sbin/nginx --conf-path=/etc/nginx/nginx.conf --with-openssl=$LIB_DIR/openssl --with-cc-opt='-I$LIB_DIR/openssl/oqs/include' --with-ld-opt='-L$LIB_DIR/openssl/oqs/lib' && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
+cd $LIB_DIR/nginx-$NGINX_VER && ./configure --prefix=/usr/share/nginx/sbin/nginx --conf-path=/etc/nginx/nginx.conf --with-openssl=$LIB_DIR/openssl --with-cc-opt='-I$LIB_DIR/openssl/oqs/include' --with-ld-opt='-L$LIB_DIR/openssl/oqs/lib' && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
 
 #upgrade new binary file 
 sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
