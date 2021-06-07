@@ -47,7 +47,6 @@ function get_nginx {
 # variables for directories and build params:
 
 TOOL_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-echo $TOOL_DIR
 LIB_DIR='/opt'
 NGINX_VER=$(nginx -V  2>&1 | grep 'nginx version:' | awk '{print $2}' FS='nginx version: nginx/' | sed 's/\s.*$//')
 MAKE_PARAM='-j 2'
@@ -73,8 +72,6 @@ else
 	cd $LIB_DIR && get_libs
 	#test_echo
 fi
-
-echo 'working directory is set to: ${LIB_DIR}'
 
 get_dependencies
 get_nginx
