@@ -67,8 +67,8 @@ fi
 
 echo 'working directory is set to: ${LIB_DIR}'
 
-#get_dependencies
-#get_nginx
+get_dependencies
+get_nginx
 
 echo ""
 echo "Building liboqs..."
