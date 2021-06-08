@@ -57,4 +57,4 @@ echo "=================================================================="
 echo 'This Nginx reconfiguration supports following algorithms for key exchange: ${ALGOS}. You can visit https://github.com/open-quantum-safe/openssl for a list of all supported algorithms'
 echo "=================================================================="
 echo ""
-	python3 $TOOL_DIR/conf_edit.py $PORT $LIB_DIR/pki/$DOMAIN\_server.cert $LIB_DIR/pki/$DOMAIN\_server.key $ALGOS $DOMAIN
+	python3 $TOOL_DIR/conf_edit.py $PORT $LIB_DIR/pki/$DOMAIN\_server.crt $LIB_DIR/pki/$DOMAIN\_server.key $ALGOS $DOMAIN
