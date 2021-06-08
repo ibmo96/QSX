@@ -20,6 +20,7 @@ This is the official QSX tool for setting up and prototpying a quantum-secure NG
 ## Prerequesites 
 - Debian/Ubuntu machine. 
 - Root user.
+- OpenSSL installed version >=1.1.1
 - Having an Nginx installation of >=14.1.2
 - For enabling a post-quantum endpoint you should already have HTTPS enabled ([Certbot](https://github.com/certbot/certbot) is a great tool to enable HTTPS on Nginx.
 
