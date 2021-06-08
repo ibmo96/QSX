@@ -17,8 +17,9 @@ echo ""
 echo "Reloading Nginx configuration..."
 
 # Reload configuration
-	MASTER_PID=$(sudo cat /run/nginx.pid)
-	sudo kill -HUP $MASTER_PID
+	#MASTER_PID=$(sudo cat /run/nginx.pid)
+	#sudo kill -HUP $MASTER_PID
+	nginx -s reload
 
 echo ""
 echo "Nginx signals sent successfully!"
