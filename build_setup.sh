@@ -25,6 +25,9 @@ fi
 
 ## Dependencies needed
 function get_dependencies {
+	echo""
+	echo"Checking/installation dependencies..."
+	echo ""
 	INSTALL_PKGS="cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip libpcre3 libpcre3-dev libxslt1-dev libxml2-dev libxml2 libgd-dev libgeoip-dev"
         for i in $INSTALL_PKGS; do
   		sudo apt-get install -y $i
@@ -45,6 +48,9 @@ function get_libs {
 
 ## Retrieve the NGINX sourcefiles
 function get_nginx {
+     echo ""
+    echo "Getting Nginx source..."
+    echo ""
     wget nginx.org/download/nginx-$NGINX_VER.tar.gz && tar -zxvf nginx-$NGINX_VER.tar.gz;
 }
 
