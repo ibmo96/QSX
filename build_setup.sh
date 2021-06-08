@@ -98,39 +98,12 @@ echo 'Retrieving current NGINX configuration arguments...'
 
 my_command=$(nginx -V  2>&1 | grep 'configure arguments:' | awk '{print $2}' FS='configure arguments:')
 
-#Create array of configure arguments
-#concat_commands=$(echo $my_command | sed 's|--|\n|g')
-#counter=1 #start at 1, 0 is whitespace
-#readarray -t array <<<"$concat_commands"
-
-#found_prefix=false
-#found_conf=false
-#found_cc_opt=false
-#found_ld_opt=false
-
-#make sure prefix is set to share/usr/nginx
-
-#configure_arguments=()
-#for i in "${array[@]}"
-#do
- #   configure_arguments[$counter]="--$i"
- #   counter=$((counter + 1))
-#done
-
-#remove first whitespace element
-#unset configure_arguments[1]
-
-#append OQS-OpenSSL location to list of arguments
-#configure_arguments+=("--with-openssl=$LIB_DIR/openssl")
-
 #input OQS openssl compiler refference in nginx configure arguments
 my_command=$(sed "s|--with-cc-opt='.*'|--with-cc-opt='-I$LIB_DIR/openssl/oqs/include' --with-ld-opt='-L$LIB_DIR/openssl/oqs/lib'|"<<< $my_command)
-#my_command=$(sed "s|--with-ld-opt='.*'|--with-ld-opt='-L$LIB_DIR/openssl/oqs/lib'|"<<< $my_command)
 my_command=$(sed "s|--add-dynamic-module.*||" <<< $my_command) #omits dynamic modules is they can cause issues when configuring
 
 ## Build nginx (will also build OQS-openssl)
 cd $LIB_DIR/nginx-$NGINX_VER && ./configure $my_command --with-openssl=$LIB_DIR/openssl && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install || exit 1
-#cd $LIB_DIR/nginx-$NGINX_VER && ./configure --prefix=/usr/share/nginx --pid-path=/run/nginx.pid --conf-path=/etc/nginx/nginx.conf --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --with-cc-opt="-I$LIB_DIR/openssl/oqs/include" --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install || exit 1
 
 #upgrade new binary file 
 sudo mv /usr/sbin/nginx /usr/sbin/nginx_old
