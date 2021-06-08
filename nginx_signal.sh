@@ -23,4 +23,4 @@ echo "Reloading Nginx configuration..."
 
 echo ""
 echo "Nginx signals sent successfully!"
-echo "
+echo ""
