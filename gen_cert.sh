@@ -10,15 +10,6 @@ read DOMAIN
 
 ## Create test certificate using OQS domain
 
-#if [ -d "$LIB_DIR/cacert" ] 
-#then
- #   echo "Directory $LIB_DIR/cacert already exists, overriding any existing certificate.." 
-#else
- #  cd $LIB_DIR && mkdir cacert && mkdir pki
-  #  echo "Generating certificates.."
-#fi
-
-
 cd $LIB_DIR && mkdir -p cacert && mkdir -p pki && set -x #prints executed commands  &&
 cd $LIB_DIR/openssl/apps &&
 
