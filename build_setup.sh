@@ -118,8 +118,8 @@ unset configure_arguments[1]
 configure_arguments+=("--with-openssl=$LIB_DIR/openssl")
 
 #input OQS openssl compiler refference in nginx configure arguments
-my_command=$(sed "s|--with-cc-opt='.*'|--with-cc-opt='-I$LIB_DIR/openssl/oqs/include'|"<<< $my_command)
-my_command=$(sed "s|--with-ld-opt='.*'|--with-ld-opt='-L$LIB_DIR/openssl/oqs/lib'|"<<< $my_command)
+my_command=$(sed "s|--with-cc-opt='.*'|--with-cc-opt='-I$LIB_DIR/openssl/oqs/include' --with-ld-opt='-L$LIB_DIR/openssl/oqs/lib'|"<<< $my_command)
+#my_command=$(sed "s|--with-ld-opt='.*'|--with-ld-opt='-L$LIB_DIR/openssl/oqs/lib'|"<<< $my_command)
 my_command=$(sed "s|--add-dynamic-module.*||" <<< $my_command) #omits dynamic modules is they can cause issues when configuring
 
 ## Build nginx (will also build OQS-openssl)
