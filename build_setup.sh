@@ -77,7 +77,7 @@ else
 	#test_echo
 fi
 
-get_nginx
+cd $LIB_DIR && get_nginx
 
 echo ""
 echo "Building liboqs..."
