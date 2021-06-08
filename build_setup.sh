@@ -57,9 +57,8 @@ MAKE_PARAM='-j 2'
 LIBOQS_BUILD_PARAM="-DOQS_DIST_BUILD=ON -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs .."
 SIG_ALG='dilithium2'
 
-get_dependencies || exit 1
 
-#Liboqs/OQS-OpenSSL/Nginx directory selection
+#Directory selection
 echo ""
 echo "=================================================================="
 echo 'Specify a directory for installing liboqs, openssl and nginx sourcefiles. If you dont wish to, press enter and they will be installed in /opt"' 
@@ -69,15 +68,14 @@ read DIR_RES
 
 if [[ -z $DIR_RES ]]
 then
-	cd $LIB_DIR && get_libs
+	cd $LIB_DIR && get_dependencies && get_libs && get_nginx || exit 1
 	#test_echo
 else
 	LIB_DIR=$DIR_RES
-	cd $LIB_DIR && get_libs
+	cd $LIB_DIR && get_dependencies && get_libs && get_nginx || exit 1
 	#test_echo
 fi
 
-cd $LIB_DIR && get_nginx
 
 echo ""
 echo "Building liboqs..."
@@ -93,9 +91,9 @@ echo 'Retrieving current NGINX configuration arguments...'
 my_command=$(nginx -V  2>&1 | grep 'configure arguments:' | awk '{print $2}' FS='configure arguments:')
 
 #Create array of configure arguments
-concat_commands=$(echo $my_command | sed 's|--|\n|g')
-counter=1 #start at 1, 0 is whitespace
-readarray -t array <<<"$concat_commands"
+#concat_commands=$(echo $my_command | sed 's|--|\n|g')
+#counter=1 #start at 1, 0 is whitespace
+#readarray -t array <<<"$concat_commands"
 
 #found_prefix=false
 #found_conf=false
@@ -104,18 +102,18 @@ readarray -t array <<<"$concat_commands"
 
 #make sure prefix is set to share/usr/nginx
 
-configure_arguments=()
-for i in "${array[@]}"
-do
-    configure_arguments[$counter]="--$i"
-    counter=$((counter + 1))
-done
+#configure_arguments=()
+#for i in "${array[@]}"
+#do
+ #   configure_arguments[$counter]="--$i"
+ #   counter=$((counter + 1))
+#done
 
 #remove first whitespace element
-unset configure_arguments[1]
+#unset configure_arguments[1]
 
 #append OQS-OpenSSL location to list of arguments
-configure_arguments+=("--with-openssl=$LIB_DIR/openssl")
+#configure_arguments+=("--with-openssl=$LIB_DIR/openssl")
 
 #input OQS openssl compiler refference in nginx configure arguments
 my_command=$(sed "s|--with-cc-opt='.*'|--with-cc-opt='-I$LIB_DIR/openssl/oqs/include' --with-ld-opt='-L$LIB_DIR/openssl/oqs/lib'|"<<< $my_command)
