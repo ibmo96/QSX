@@ -74,11 +74,11 @@ read DIR_RES
 
 if [[ -z $DIR_RES ]]
 then
-	cd $LIB_DIR && get_dependencies && get_libs && get_nginx || exit 1
+	cd $LIB_DIR && get_dependencies && cd $LIB_DIR && get_libs && cd $LIB_DIR && get_nginx || exit 1
 	#test_echo
 else
 	LIB_DIR=$DIR_RES
-	cd $LIB_DIR && get_dependencies && get_libs && get_nginx || exit 1
+	cd $LIB_DIR && get_dependencies && cd $LIB_DIR && get_libs && cd $LIB_DIR && get_nginx || exit 1
 	#test_echo
 fi
 
