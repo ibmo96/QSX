@@ -57,7 +57,7 @@ MAKE_PARAM='-j 2'
 LIBOQS_BUILD_PARAM="-DOQS_DIST_BUILD=ON -DBUILD_SHARED_LIBS=OFF -DOQS_USE_CPU_EXTENTIONS=OFF -DCMAKE_INSTALL_PREFIX=$LIB_DIR/openssl/oqs .."
 SIG_ALG='dilithium2'
 
-
+get_dependencies || exit 1
 
 #Liboqs/OQS-OpenSSL/Nginx directory selection
 echo ""
@@ -77,7 +77,6 @@ else
 	#test_echo
 fi
 
-get_dependencies || exit 1
 get_nginx
 
 echo ""
