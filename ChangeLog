@@ -1,9 +1,20 @@
 # Summary of release changes, see commit history for more details:
-# https://github.com/ibmo96/OQS-MOFF/commits/master
+# https://github.com/ibmo96/QSX/commits/master
 
 
 # Release descriptions: 
 
 * V.1.0
 
- - TBA
+ - Version 1.0 of QSX functioning on Debian and Ubuntu machines. 
+ - Requires Nginx installation of 1.14.2 or higher. 
+ - Checks for root and nginx installaton upon start of ./build_setup.sh
+ - Installs relevant dependencies based on Nginx version 1.14.2.
+   - Downloads and installs zlib version 1.2.9 for the Nginx HTTP rewrite module (good for modifying functionality needed by tools like Certbot)  
+ - Clones Open Quantum Safe OpenSSL and Liboqs libraries
+ - Donwloads Nginx sourcefiles based on the version of the package installed Nginx. 
+ - Retrieves pre-existing configure arguments provided by "nginx -V"
+ - Appends --with-cc-opt, --with-ld-opt and --with-openssl arguments to the pre-existing configure arguments to implement OQS OpenSSL
+ - Prompts for optional generation of a self-signed certificate (signed by a post-quantum algorithm) 
+   - Can edit nginx.conf file automatically to reference self-signed certificate (if created). 
+ - Sends necessary Nginx signals to update binary and configuration without server down-time. 
