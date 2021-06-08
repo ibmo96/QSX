@@ -129,7 +129,7 @@ my_command=$(sed "s|--with-cc-opt='.*'|--with-cc-opt='-I$LIB_DIR/openssl/oqs/inc
 my_command=$(sed "s|--add-dynamic-module.*||" <<< $my_command) #omits dynamic modules is they can cause issues when configuring
 
 ## Build nginx (will also build OQS-openssl)
-cd $LIB_DIR/nginx-$NGINX_VER && ./configure $my_command && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install || exit 1
+cd $LIB_DIR/nginx-$NGINX_VER && ./configure $my_command --with-openssl=$LIB_DIR/openssl && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install || exit 1
 #cd $LIB_DIR/nginx-$NGINX_VER && ./configure --prefix=/usr/share/nginx --pid-path=/run/nginx.pid --conf-path=/etc/nginx/nginx.conf --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --with-cc-opt="-I$LIB_DIR/openssl/oqs/include" --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install || exit 1
 
 #upgrade new binary file 
