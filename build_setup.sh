@@ -25,7 +25,7 @@ fi
 
 ## Dependencies needed
 function get_dependencies {
-	INSTALL_PKGS="cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip libpcre3 libpcre3-dev"
+	INSTALL_PKGS="cmake gcc libtool libssl-dev make ninja-build git doxygen python3-pip libpcre3 libpcre3-dev libxslt1-dev libxml2-dev libxml2 libgd-dev libgeoip-dev"
         for i in $INSTALL_PKGS; do
   		sudo apt-get install -y $i
 	done
@@ -123,7 +123,7 @@ my_command=$(sed "s|--with-ld-opt='.*'|--with-ld-opt='-L$LIB_DIR/openssl/oqs/lib
 my_command=$(sed "s|--add-dynamic-module.*||" <<< $my_command) #omits dynamic modules is they can cause issues when configuring
 
 ## Build nginx (will also build OQS-openssl)
-cd $LIB_DIR/nginx-$NGINX_VER && ./configure $my_command && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install
+cd $LIB_DIR/nginx-$NGINX_VER && ./configure $my_command && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install || exit 1
 #cd $LIB_DIR/nginx-$NGINX_VER && ./configure --prefix=/usr/share/nginx --pid-path=/run/nginx.pid --conf-path=/etc/nginx/nginx.conf --with-http_ssl_module --with-openssl=$LIB_DIR/openssl --with-cc-opt="-I$LIB_DIR/openssl/oqs/include" --with-ld-opt="-L$LIB_DIR/openssl/oqs/lib" && sed -i 's/libcrypto.a/libcrypto.a -loqs/g' objs/Makefile && make $MAKE_PARAM && make install || exit 1
 
 #upgrade new binary file 
