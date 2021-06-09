@@ -188,7 +188,7 @@ def modify_conf(filename, port, cert, key, algos,  server_name):
                      i.close()
             else: #If we dont find the given port in the conf file, we create a whole new server directive
                print('Creating new server directive for port {}...'.format(port))
-               new_data = append_new_server_directive(filename, lines, port, server_name, cert, key, algos, TOOL_PATH + '/templates/html', 'qsx_template.html qsx_template.htm')
+               new_data = append_new_server_directive(filename, lines, port, server_name, cert, key, algos, TOOL_PATH + '/templates', 'qsx_template.html qsx_template.htm')
                with open(filename, "w") as i: 
                   i.writelines(new_data)
                   i.close()
